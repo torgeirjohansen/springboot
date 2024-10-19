@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.example.withcustomauthdemo.auth.Authenticated;
-import com.example.withcustomauthdemo.auth.SecurityContextService;
+import com.example.withcustomauthdemo.auth.SecurityContextProvider;
 import com.example.withcustomauthdemo.auth.UnauthorizedException;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -16,9 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthAspect {
 
-    private final SecurityContextService securityContextService;
+    private final SecurityContextProvider securityContextService;
 
-    public AuthAspect(SecurityContextService securityContextService) {
+    public AuthAspect(SecurityContextProvider securityContextService) {
         this.securityContextService = securityContextService;
     }
 
