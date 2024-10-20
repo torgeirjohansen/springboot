@@ -6,10 +6,10 @@ import com.example.withcustomauthdemo.model.StoredString;
 import com.example.withcustomauthdemo.model.StringRequest;
 import com.example.withcustomauthdemo.repository.StringRepository;
 
-public class StringService implements StringServiceI {
+public class StringServiceImpl implements StringService {
     private final StringRepository repository;
 
-    public StringService(StringRepository repository) {
+    public StringServiceImpl(StringRepository repository) {
         this.repository = repository;
     }
 

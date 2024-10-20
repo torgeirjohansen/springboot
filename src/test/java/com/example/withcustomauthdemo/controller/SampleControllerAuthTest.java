@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.example.withcustomauthdemo.aspect.AuthAspect;
 import com.example.withcustomauthdemo.auth.SecurityContextProvider;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(SampleController.class)
 @Import(AuthAspect.class)
-public class SampleControllerTest {
+public class SampleControllerAuthTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -30,8 +30,13 @@ public class SampleControllerTest {
     @MockBean
     private SecurityContextProvider securityContextService;
 
+//    @BeforeMethod
+//    public void beforeMethod() {
+//        securityContextService = mock(SecurityContextProvider.class);
+//    }
+
     @Test
-    void whenUserRole_thenPrivateEndpointForbidden() throws Exception {
+    public void whenUserRole_thenPrivateEndpointForbidden() throws Exception {
         // Mock an authentication with the "USER" role
         Authentication authentication = mock(Authentication.class);
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -45,7 +50,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    void whenAdminRole_thenPrivateEndpointAccessible() throws Exception {
+    public void whenAdminRole_thenPrivateEndpointAccessible() throws Exception {
         // Mock an authentication with the "ADMIN" role
         Authentication authentication = mock(Authentication.class);
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -58,7 +63,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    void whenAdminRole_thenPublicEndpointAccessible() throws Exception {
+    public void whenAdminRole_thenPublicEndpointAccessible() throws Exception {
         // Mock an authentication with the "ADMIN" role
         Authentication authentication = mock(Authentication.class);
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -73,7 +78,7 @@ public class SampleControllerTest {
     }
 
     @Test
-    void whenUserRole_thenPublicEndpointForbidden() throws Exception {
+    public void whenUserRole_thenPublicEndpointForbidden() throws Exception {
         // Mock an authentication with the "USER" role
         Authentication authentication = mock(Authentication.class);
         when(authentication.isAuthenticated()).thenReturn(true);

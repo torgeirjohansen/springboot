@@ -1,4 +1,3 @@
 package com.example.withcustomauthdemo.model;
 
-public class StoredString {
-}
+public record StoredString(String id, String content) {}
