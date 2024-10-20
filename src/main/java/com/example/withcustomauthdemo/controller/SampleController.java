@@ -14,7 +14,7 @@ public class SampleController {
         return "This is a public endpoint.";
     }
 
-    @Authenticated
+    @Authenticated(roles = {"ROLE_ADMIN"})
     @GetMapping("/private")
     public String privateEndpoint() {
         return "This is a private endpoint, accessible only to authenticated users.";

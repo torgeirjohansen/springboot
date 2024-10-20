@@ -35,7 +35,7 @@ public class SampleControllerTest {
         // Mock an authentication with the "USER" role
         Authentication authentication = mock(Authentication.class);
         when(authentication.isAuthenticated()).thenReturn(true);
-        Collection<GrantedAuthority> granted = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        Collection<GrantedAuthority> granted = List.of(new SimpleGrantedAuthority("USER"));
         when(authentication.getAuthorities()).thenReturn((Collection) granted);
 
         when(securityContextService.getAuthentication()).thenReturn(authentication);
@@ -49,14 +49,8 @@ public class SampleControllerTest {
         // Mock an authentication with the "ADMIN" role
         Authentication authentication = mock(Authentication.class);
         when(authentication.isAuthenticated()).thenReturn(true);
-        List<GrantedAuthority> granted = null;
+        Collection<GrantedAuthority> granted = List.of(new SimpleGrantedAuthority("ADMIN"));
         when(authentication.getAuthorities()).thenReturn((Collection) granted);
-        when(securityContextService.getAuthentication()).thenReturn(authentication);
-
-        when(authentication.getAuthorities()).thenReturn((Collection) granted);
-
-        when(securityContextService.getAuthentication()).thenReturn(authentication);
-
         when(securityContextService.getAuthentication()).thenReturn(authentication);
 
         mockMvc.perform(get("/api/private"))
@@ -69,7 +63,7 @@ public class SampleControllerTest {
         Authentication authentication = mock(Authentication.class);
         when(authentication.isAuthenticated()).thenReturn(true);
         when(authentication.getAuthorities()).thenReturn(
-            (Collection) List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+            (Collection) List.of(new SimpleGrantedAuthority("ADMIN"))
         );
 
         when(securityContextService.getAuthentication()).thenReturn(authentication);
@@ -84,7 +78,7 @@ public class SampleControllerTest {
         Authentication authentication = mock(Authentication.class);
         when(authentication.isAuthenticated()).thenReturn(true);
         when(authentication.getAuthorities()).thenReturn(
-            (Collection) List.of(new SimpleGrantedAuthority("ROLE_USER"))
+            (Collection) List.of(new SimpleGrantedAuthority("USER"))
         );
 
         when(securityContextService.getAuthentication()).thenReturn(authentication);
