@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.example.withcustomauthdemo.aspect.AuthAspect;
-import com.example.withcustomauthdemo.auth.SecurityContextProvider;
+import com.example.withcustomauthdemo.auth.SecurityContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,19 +21,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SampleController.class)
-@Import(AuthAspect.class)
+@Import({AuthAspect.class, SecurityContextService.class})
 public class SampleControllerAuthTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private SecurityContextProvider securityContextService;
-
-//    @BeforeMethod
-//    public void beforeMethod() {
-//        securityContextService = mock(SecurityContextProvider.class);
-//    }
+    private SecurityContextService securityContextService;
 
     @Test
     public void whenUserRole_thenPrivateEndpointForbidden() throws Exception {
