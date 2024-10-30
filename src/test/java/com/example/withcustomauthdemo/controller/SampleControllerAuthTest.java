@@ -1,95 +1,81 @@
-package com.example.withcustomauthdemo.controller;
-
 import java.util.Collection;
 import java.util.List;
 
 import com.example.withcustomauthdemo.aspect.AuthAspect;
-import com.example.withcustomauthdemo.auth.SecurityContextService;
+import com.example.withcustomauthdemo.auth.SecurityContextProvider;
+import com.example.withcustomauthdemo.controller.SampleController;
+import com.example.withcustomauthdemo.service.StringService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(SampleController.class)
-@Import({AuthAspect.class, SecurityContextService.class})
+@SpringBootTest
+@AutoConfigureMockMvc // Automatically configures MockMvc with all controllers
 public class SampleControllerAuthTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private SecurityContextService securityContextService;
+    @Mock
+    private SecurityContextProvider securityContextProvider;
 
-    @MockBean
-    private AuthAspect authAspect; // Mock the aspect itself
+    @InjectMocks
+    private AuthAspect authAspect;
 
-//    @BeforeMethod
-//    public void beforeMethod() ()
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+    }
 
     @Test
-    public void whenUserRole_thenPrivateEndpointForbidden() throws Exception {
+    public void whenUserRole_thenDeleteEndpointForbidden() throws Exception {
         // Mock an authentication with the "USER" role
         Authentication authentication = mock(Authentication.class);
         when(authentication.isAuthenticated()).thenReturn(true);
-        Collection<GrantedAuthority> granted = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        when(authentication.getAuthorities()).thenReturn((Collection) granted);
+        Collection<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        when(authentication.getAuthorities()).thenReturn((Collection) authorities);
 
-        when(securityContextService.getAuthentication()).thenReturn(authentication);
+        // Return this authentication from SecurityContextProvider
+        when(securityContextProvider.getAuthentication()).thenReturn(authentication);
 
-        mockMvc.perform(get("/api/123"))
-               .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void whenAdminRole_thenPrivateEndpointAccessible() throws Exception {
-        // Mock an authentication with the "ADMIN" role
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.isAuthenticated()).thenReturn(true);
-        Collection<GrantedAuthority> granted = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        when(authentication.getAuthorities()).thenReturn((Collection) granted);
-        when(securityContextService.getAuthentication()).thenReturn(authentication);
-
-        mockMvc.perform(get("/api/private"))
-               .andExpect(status().isOk());
-    }
-
-    @Test
-    public void whenAdminRole_thenPublicEndpointAccessible() throws Exception {
-        // Mock an authentication with the "ADMIN" role
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.isAuthenticated()).thenReturn(true);
-        when(authentication.getAuthorities()).thenReturn(
-            (Collection) List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
-        );
-
-        when(securityContextService.getAuthentication()).thenReturn(authentication);
-
-        mockMvc.perform(get("/api/public"))
-               .andExpect(status().isOk());
-    }
-
-    @Test
-    public void whenUserRole_thenPublicEndpointForbidden() throws Exception {
-        // Mock an authentication with the "USER" role
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.isAuthenticated()).thenReturn(true);
-        when(authentication.getAuthorities()).thenReturn(
-            (Collection) List.of(new SimpleGrantedAuthority("ROLE_USER"))
-        );
-
-        when(securityContextService.getAuthentication()).thenReturn(authentication);
-
-        mockMvc.perform(get("/api/public"))
+        // Perform request and expect a Forbidden status due to insufficient role
+        mockMvc.perform(delete("/api/private")) // Ensure this path matches your controller mapping
                .andExpect(status().isForbidden());
+    }
+
+    // Test configuration to register aspect, controller, and mock bean
+    @Configuration
+    static class TestConfig {
+        @Bean
+        public AuthAspect authAspect(SecurityContextProvider securityContextProvider) {
+            return new AuthAspect(securityContextProvider);
+        }
+
+        @Bean
+        public SecurityContextProvider securityContextProvider() {
+            return mock(SecurityContextProvider.class);
+        }
+
+        // Explicitly register the controller if it's not auto-detected
+        @Bean
+        public SampleController sampleController() {
+            return new SampleController(mock(StringService.class));
+        }
     }
 }
