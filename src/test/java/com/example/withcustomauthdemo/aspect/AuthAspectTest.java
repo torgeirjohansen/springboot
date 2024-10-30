@@ -3,7 +3,7 @@ package com.example.withcustomauthdemo.aspect;
 import java.util.Collection;
 import java.util.List;
 
-import com.example.withcustomauthdemo.auth.Authenticated;
+import com.example.withcustomauthdemo.auth.Auth;
 import com.example.withcustomauthdemo.auth.SecurityContextProvider;
 import com.example.withcustomauthdemo.auth.UnauthorizedException;
 import org.mockito.InjectMocks;
@@ -28,7 +28,7 @@ public class AuthAspectTest {
     private Authentication authentication;
 
     @Mock
-    private Authenticated authenticated;
+    private Auth auth;
 
     @InjectMocks
     private AuthAspect authAspect;
@@ -44,9 +44,9 @@ public class AuthAspectTest {
         when(authentication.isAuthenticated()).thenReturn(true);
         var granted = List.of(new SimpleGrantedAuthority("ROLE_USER"));
         when(authentication.getAuthorities()).thenReturn((Collection) granted);
-        when(authenticated.roles()).thenReturn(new String[]{"ROLE_USER"});
+        when(auth.roles()).thenReturn(new String[]{"ROLE_USER"});
 
-        assertDoesNotThrow(() -> authAspect.authenticate(authenticated));
+        assertDoesNotThrow(() -> authAspect.authenticate(auth));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class AuthAspectTest {
         when(securityContextProvider.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(false);
 
-        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> authAspect.authenticate(authenticated));
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> authAspect.authenticate(auth));
         assertEquals("User is not authenticated", exception.getMessage());
     }
 
@@ -63,9 +63,9 @@ public class AuthAspectTest {
         when(securityContextProvider.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
         when(authentication.getAuthorities()).thenReturn((Collection) List.of(new SimpleGrantedAuthority("ROLE_USER")));
-        when(authenticated.roles()).thenReturn(new String[]{"ROLE_ADMIN"});
+        when(auth.roles()).thenReturn(new String[]{"ROLE_ADMIN"});
 
-        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> authAspect.authenticate(authenticated));
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> authAspect.authenticate(auth));
         assertEquals("User is not authorized for this endpoint", exception.getMessage());
     }
 }

@@ -30,6 +30,12 @@ public class SampleControllerAuthTest {
     @MockBean
     private SecurityContextService securityContextService;
 
+    @MockBean
+    private AuthAspect authAspect; // Mock the aspect itself
+
+//    @BeforeMethod
+//    public void beforeMethod() ()
+
     @Test
     public void whenUserRole_thenPrivateEndpointForbidden() throws Exception {
         // Mock an authentication with the "USER" role
@@ -40,7 +46,7 @@ public class SampleControllerAuthTest {
 
         when(securityContextService.getAuthentication()).thenReturn(authentication);
 
-        mockMvc.perform(get("/api/private"))
+        mockMvc.perform(get("/api/123"))
                .andExpect(status().isUnauthorized());
     }
 

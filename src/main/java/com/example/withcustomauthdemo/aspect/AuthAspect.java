@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.example.withcustomauthdemo.auth.Authenticated;
+import com.example.withcustomauthdemo.auth.Auth;
 import com.example.withcustomauthdemo.auth.SecurityContextProvider;
 import com.example.withcustomauthdemo.auth.UnauthorizedException;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,8 +22,8 @@ public class AuthAspect {
         this.securityContextService = securityContextService;
     }
 
-    @Before("@annotation(authenticated)")
-    public void authenticate(Authenticated authenticated) {
+    @Before("@annotation(auth)")
+    public void authenticate(Auth auth) {
         // Get the current authenticated user's roles
         Authentication authentication = securityContextService.getAuthentication();
 
@@ -36,7 +36,7 @@ public class AuthAspect {
                                                .collect(Collectors.toList());
 
         // Get the allowed roles from the annotation
-        String[] allowedRoles = authenticated.roles();
+        String[] allowedRoles = auth.roles();
 
         // Check if the user has any of the required roles
         boolean isAuthorized = Arrays.stream(allowedRoles).anyMatch(userRoles::contains);

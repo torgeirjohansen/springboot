@@ -3,7 +3,6 @@ package com.example.withcustomauthdemo.config;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.example.withcustomauthdemo.auth.SecurityContextProvider;
 import com.example.withcustomauthdemo.auth.SecurityContextService;
 import com.example.withcustomauthdemo.repository.InMemoryStringRepository;
 import com.example.withcustomauthdemo.repository.StringRepository;
@@ -21,12 +20,12 @@ public class AppConfig {
     }
 
     @Bean
-    public SecurityContextProvider securityContextService() {
+    public SecurityContextService securityContextService() {
         return new SecurityContextService();
     }
 
     @Bean
-    public StringService stringServiceI() {
+    public StringService stringServiceImpl() {
         return new StringServiceImpl(stringRepository());
     }
 
