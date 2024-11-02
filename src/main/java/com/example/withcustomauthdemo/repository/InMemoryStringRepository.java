@@ -5,9 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.example.withcustomauthdemo.model.StoredString;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public class InMemoryStringRepository implements StringRepository {
     private final ConcurrentMap<String, StoredString> store = new ConcurrentHashMap<>();
 
