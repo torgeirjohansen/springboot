@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 
 import com.example.withcustomauthdemo.auth.SecurityContextProvider;
+import com.example.withcustomauthdemo.model.StoredString;
+import com.example.withcustomauthdemo.service.StringService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -23,6 +25,7 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -35,6 +38,9 @@ public class SampleControllerAuthTest {
     @MockBean
     private SecurityContextProvider securityContextProvider;
 
+    @MockBean
+    private StringService stringService;
+
     @Autowired
     private WebApplicationContext context;
 
@@ -46,19 +52,15 @@ public class SampleControllerAuthTest {
 
     @Test
     public void whenAdminRole_thenDeleteEndpointSuccess() throws Exception {
-        // Mock an authentication with the "ROLE_ADMIN"
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.isAuthenticated()).thenReturn(true);
-        Collection<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        when(authentication.getAuthorities()).thenReturn((Collection) authorities);
+        setupSecurityContext("ROLE_ADMIN");
 
-        // Set up the SecurityContext with ADMIN role
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
+        mockMvc.perform(delete("/api/123"))
+               .andExpect(status().isOk());
+    }
 
-        // Mock SecurityContextProvider to return the mock authentication
-        when(securityContextProvider.getAuthentication()).thenReturn(authentication);
+    @Test
+    public void whenAdminRole_thenDeleteEndpointSuccess2() throws Exception {
+        setupSecurityContext("ROLE_ADMIN");
 
         mockMvc.perform(delete("/api/123"))
                .andExpect(status().isOk());
@@ -66,21 +68,39 @@ public class SampleControllerAuthTest {
 
     @Test
     public void whenUserRole_thenDeleteEndpointForbidden() throws Exception {
-        // Mock an authentication with the "ROLE_USER"
+        setupSecurityContext("ROLE_USER");
+
+        mockMvc.perform(delete("/api/123"))
+               .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void whenUserRole_thenGetEndpointSuccess() throws Exception {
+        setupSecurityContext("ROLE_USER");
+        when(stringService.getStringById("123")).thenReturn(new StoredString("id", "Test String"));
+
+        mockMvc.perform(get("/api/123"))
+               .andExpect(status().isOk());
+    }
+
+    @Test
+    public void whenInvalidRole_thenGetEndpointSuccess() throws Exception {
+        setupSecurityContext("INVALID_ROLE");
+
+        mockMvc.perform(get("/api/123"))
+               .andExpect(status().isUnauthorized());
+    }
+
+    private void setupSecurityContext(String role) {
         Authentication authentication = mock(Authentication.class);
         when(authentication.isAuthenticated()).thenReturn(true);
-        Collection<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        Collection<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
         when(authentication.getAuthorities()).thenReturn((Collection) authorities);
 
-        // Set up the SecurityContext with USER role
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        // Mock SecurityContextProvider to return the mock authentication
         when(securityContextProvider.getAuthentication()).thenReturn(authentication);
-
-        mockMvc.perform(delete("/api/123"))
-               .andExpect(status().isUnauthorized());
     }
 }
