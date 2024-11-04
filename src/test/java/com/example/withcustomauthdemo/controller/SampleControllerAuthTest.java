@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.example.withcustomauthdemo.auth.SecurityContextProvider;
 import com.example.withcustomauthdemo.model.StoredString;
-import com.example.withcustomauthdemo.model.StringRequest;
 import com.example.withcustomauthdemo.service.StringService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -91,19 +89,6 @@ public class SampleControllerAuthTest {
 
         mockMvc.perform(get("/api/123"))
                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void whenAdminRole_thenPostEndpointSuccess2() throws Exception {
-        setupSecurityContext("ROLE_ADMIN");
-
-        StringRequest request = new StringRequest("Test String");
-        when(stringService.storeString(request)).thenReturn(new StoredString("id", "Test String"));
-
-        mockMvc.perform(post("/api")
-                            .contentType("application/json")
-                            .content("{\"content\":\"\"}"))
-               .andExpect(status().isOk());
     }
 
     private void setupSecurityContext(String role) {
