@@ -22,6 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static com.example.withcustomauthdemo.auth.Auth.ROLE_ADMIN;
+import static com.example.withcustomauthdemo.auth.Auth.ROLE_USER;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -52,7 +54,7 @@ public class SampleControllerAuthTest {
 
     @Test
     public void whenAdminRole_thenDeleteEndpointSuccess() throws Exception {
-        setupSecurityContext("ROLE_ADMIN");
+        setupSecurityContext(ROLE_ADMIN);
 
         mockMvc.perform(delete("/api/123"))
                .andExpect(status().isOk());
@@ -60,7 +62,7 @@ public class SampleControllerAuthTest {
 
     @Test
     public void whenAdminRole_thenDeleteEndpointSuccess2() throws Exception {
-        setupSecurityContext("ROLE_ADMIN");
+        setupSecurityContext(ROLE_ADMIN);
 
         mockMvc.perform(delete("/api/123"))
                .andExpect(status().isOk());
@@ -68,7 +70,7 @@ public class SampleControllerAuthTest {
 
     @Test
     public void whenUserRole_thenDeleteEndpointForbidden() throws Exception {
-        setupSecurityContext("ROLE_USER");
+        setupSecurityContext(ROLE_USER);
 
         mockMvc.perform(delete("/api/123"))
                .andExpect(status().isUnauthorized());
@@ -76,7 +78,7 @@ public class SampleControllerAuthTest {
 
     @Test
     public void whenUserRole_thenGetEndpointSuccess() throws Exception {
-        setupSecurityContext("ROLE_USER");
+        setupSecurityContext(ROLE_USER);
         when(stringService.getStringById("123")).thenReturn(new StoredString("id", "Test String"));
 
         mockMvc.perform(get("/api/123"))

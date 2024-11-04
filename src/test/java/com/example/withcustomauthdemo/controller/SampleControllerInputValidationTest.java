@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import static com.example.withcustomauthdemo.auth.Auth.ROLE_ADMIN;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,7 +53,7 @@ public class SampleControllerInputValidationTest {
 
     @Test
     public void contentValidShouldYieldOk() throws Exception {
-        setupSecurityContext("ROLE_ADMIN");
+        setupSecurityContext(ROLE_ADMIN);
         StringRequest request = new StringRequest("Test String");
         when(stringService.storeString(request)).thenReturn(new StoredString("id", "Test String"));
 
@@ -64,7 +65,7 @@ public class SampleControllerInputValidationTest {
 
     @Test
     public void contentTooShortShouldYieldBadRequest() throws Exception {
-        setupSecurityContext("ROLE_ADMIN");
+        setupSecurityContext(ROLE_ADMIN);
         StringRequest request = new StringRequest("Test String");
         when(stringService.storeString(request)).thenReturn(new StoredString("id", "Test String"));
 
@@ -76,7 +77,7 @@ public class SampleControllerInputValidationTest {
 
     @Test
     public void contentTooLongShouldYieldBadRequest() throws Exception {
-        setupSecurityContext("ROLE_ADMIN");
+        setupSecurityContext(ROLE_ADMIN);
 
         StringRequest request = new StringRequest("Test String");
         when(stringService.storeString(request)).thenReturn(new StoredString("id", "Test String"));

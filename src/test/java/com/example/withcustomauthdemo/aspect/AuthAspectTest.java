@@ -14,6 +14,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import static com.example.withcustomauthdemo.auth.Auth.ROLE_ADMIN;
+import static com.example.withcustomauthdemo.auth.Auth.ROLE_USER;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,9 +44,9 @@ public class AuthAspectTest {
     public void testAuthenticate_UserIsAuthenticatedAndAuthorized() {
         when(securityContextProvider.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
-        var granted = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        var granted = List.of(new SimpleGrantedAuthority(ROLE_USER));
         when(authentication.getAuthorities()).thenReturn((Collection) granted);
-        when(auth.roles()).thenReturn(new String[]{"ROLE_USER"});
+        when(auth.roles()).thenReturn(new String[]{ROLE_USER});
 
         assertDoesNotThrow(() -> authAspect.authenticate(auth));
     }
@@ -62,8 +64,8 @@ public class AuthAspectTest {
     public void testAuthenticate_UserIsNotAuthorized() {
         when(securityContextProvider.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
-        when(authentication.getAuthorities()).thenReturn((Collection) List.of(new SimpleGrantedAuthority("ROLE_USER")));
-        when(auth.roles()).thenReturn(new String[]{"ROLE_ADMIN"});
+        when(authentication.getAuthorities()).thenReturn((Collection) List.of(new SimpleGrantedAuthority(ROLE_USER)));
+        when(auth.roles()).thenReturn(new String[]{ROLE_ADMIN});
 
         UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> authAspect.authenticate(auth));
         assertEquals("User is not authorized for this endpoint", exception.getMessage());

@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.example.withcustomauthdemo.auth.Auth.ROLE_ADMIN;
+import static com.example.withcustomauthdemo.auth.Auth.ROLE_USER;
+
 @RestController
 @RequestMapping("/api")
 public class SampleController {
@@ -24,19 +27,19 @@ public class SampleController {
     }
 
     @GetMapping("/{id}")
-    @Auth(roles = {"ROLE_USER"})
+    @Auth(roles = {ROLE_USER})
     public StoredString getStringById(@Valid @PathVariable String id) {
         return stringService.getStringById(id);
     }
 
-    @Auth(roles = {"ROLE_ADMIN"})
+    @Auth(roles = {ROLE_ADMIN})
     @PostMapping
     public StoredString storeString(@Valid @RequestBody StringRequest request) {
         StoredString storedString = stringService.storeString(request);
         return storedString;
     }
 
-    @Auth(roles = {"ROLE_ADMIN"})
+    @Auth(roles = {ROLE_ADMIN})
     @DeleteMapping("/{id}")
     public void deleteStringById(@PathVariable String id) {
         stringService.deleteStringById(id);

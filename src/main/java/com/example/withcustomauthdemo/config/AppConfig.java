@@ -11,12 +11,14 @@ import com.example.withcustomauthdemo.service.StringServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static com.example.withcustomauthdemo.auth.Auth.ROLE_USER;
+
 @Configuration
 public class AppConfig {
 
     @Bean
     public Supplier<List<String>> userRolesProvider() {
-        return () -> List.of("ROLE_USER");
+        return () -> List.of(ROLE_USER);
     }
 
     @Bean
